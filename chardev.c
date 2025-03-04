@@ -120,5 +120,5 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_
 
 static ssize_t device_write(struct file *filp, const char *buff, size_t len, loff_t *off){
 	printk(KERN_ALERT "Sorry, the write operation is not supported!\n");
-	return -EINVAL; // Invalid argument (error code 22)
+	return -EINVAL; // Invalid argument (aka error code 22)
 }
