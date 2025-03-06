@@ -13,13 +13,17 @@
  *
  */
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Tayyeb Israr");
+MODULE_DESCRIPTION("Character driver which can report how many times a dev file is read from");
+
 int init_module(void);
 void cleanup_module(void);
 
 static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *); // ssize_t is a signed size_t integer which tells you about number of bytes read, or error code. loff_t * is a pointer that keeps track of the file offset, to track where the file is being read or written from/to.
-static ssize_t device_write(struct file *, const char * size_t, loff_t *);
+static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
 
 #define SUCCESS 0
 #define DEVICE_NAME "chardev" // name of the driver as seen in /proc/devices
@@ -44,7 +48,8 @@ static struct file_operations fops = {
 // When the module is loaded, the following stuff will be called
 
 int init_module(void){
-	Major = register_chrdev(0, DEVICE_NAME, &fops); // register_chrdev() dynamically assigns the device in proc/devices with an unused major number. 
+	
+	int Major = register_chrdev(0, DEVICE_NAME, &fops); // register_chrdev() dynamically assigns the device in proc/devices with an unused major number. 
 	
 	if(Major < 0){
 		printk(KERN_ALERT "Device registering failed with exit code %d", Major);
@@ -53,7 +58,7 @@ int init_module(void){
 
 	printk(KERN_INFO "This driver was successfully assigned major number %d\n", Major);
 	printk(KERN_INFO "To interact with this driver, create a dev file with the command:\n");
-	printk(KERN_IFNO "mknod /dev/%s/ c %d 0\n", DEVICE_NAME, Major);
+	printk(KERN_INFO "mknod /dev/%s/ c %d 0\n", DEVICE_NAME, Major);
 	printk(KERN_INFO "Different minor numbers can be used. You can use cat or echo to the dev file.\n");
 	printk(KERN_INFO "Remove the device file when done\n");
 
@@ -61,10 +66,12 @@ int init_module(void){
 }
 
 void cleanup_module(void){
-	int ret = unregister_chrdev(Major, DEVICE_NAME); // tries to unregister the driver - if unsuccessful returns a negative number
-	if (ret < 0){
-		printk(KERN_ALERT "Error code %d - Couldn't unregister %s\n", ret, DEVICE_NAME);
+	if (Device_Open){
+		printk(KERN_ALERT "Error - Couldn't remove yet - device is still in use!\n");
+		return;
 	}
+	
+	unregister_chrdev(Major, DEVICE_NAME); // tries to unregister the driver - if unsuccessful returns a negative number
 }
 
 
@@ -78,9 +85,9 @@ static int device_open(struct inode *inode, struct file* file){
 		return -EBUSY;
 	}
 	Device_Open++;
-	sprintf("I'VE SAID %d TIMES: Hello, world!\n", counter++);
+	sprintf(msg, "I'VE SAID %d TIMES: Hello, world!\n", counter++);
 	msg_Ptr = msg;
-	try_module_get(THIS_MODULE); // Increment usage count of module
+	// try_module_get(THIS_MODULE); // Used to increment usage count of module, but the unregister_chrdev() returns void so can't use
 
 	return SUCCESS;
 }
@@ -99,7 +106,7 @@ static int device_release(struct inode *inode, struct file *file){
 
 
 // device read - called when a process tries to read from the (opened) dev file
-static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t * offset); {
+static ssize_t device_read(struct file *filp, char *buffer, size_t length, loff_t * offset) {
 	int bytes_read = 0; // bytes written to the buffer
 
 	if (*msg_Ptr == 0){ // if at the end of the message
