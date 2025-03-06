@@ -72,6 +72,7 @@ void cleanup_module(void){
 	}
 	
 	unregister_chrdev(Major, DEVICE_NAME); // tries to unregister the driver - if unsuccessful returns a negative number
+	printk(KERN_INFO "chardev module has been successfully UNloaded\n");
 }
 
 
