@@ -1,11 +1,9 @@
 # Overview
 
 These modules are adapted from 'The Linux Kernel Module Programming Guide' and
-serve to display my progress through the guide.
-After completing this guide, I will be hopefully be continuing
-my learning of systems-level programming and Linux by creating my own driver software.
+'Let's Code a Linux Driver' by Johannes 4GNU_Linux. This repo serves to display my progress through the guides.
 
-## Gained knowledge
+# Gained knowledge
 
 Through this guide I have learned or further improved my skills in various technologies and programs, such as:
 
@@ -16,8 +14,9 @@ Through this guide I have learned or further improved my skills in various techn
 - Makefiles
 - kernels, modules and drivers
 
-## Source
+## Sources
 
-The guide, 'The Linux Kernel Module Programming Guide' can be found at tldp.org/LDP/lkmpg/2.6/html/index.html
+- The playlist, 'Let's code a Linux Driver', can be found at youtube.com/playlist?list=PLCGpd0Do5-I3b5TtyqeF1UdyD4C-S-dMa
+- The guide, 'The Linux Kernel Module Programming Guide' can be found at tldp.org/LDP/lkmpg/2.6/html/index.html
 
 
